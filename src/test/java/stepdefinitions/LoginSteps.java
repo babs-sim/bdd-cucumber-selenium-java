@@ -2,12 +2,12 @@ package stepdefinitions;
 
 import java.time.Duration;
 
-//import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-//import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 
 import io.cucumber.java.After;
@@ -23,6 +23,12 @@ public class LoginSteps {
 	private String url = "https://www.saucedemo.com/";
 	
 	//Initialise the browser before each scenario
+	
+//	@Before
+//	public void setUp() {
+//		driver = new ChromeDriver();
+//	}
+	
 	@Before
 	 public void setup() {
 		driver = library.Browsers.launchBrowser("Chrome");
