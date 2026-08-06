@@ -1,9 +1,13 @@
 package stepdefinitions;
 
+import java.time.Duration;
+
+//import java.util.concurrent.TimeUnit;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
+//import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 
 import io.cucumber.java.After;
@@ -19,26 +23,36 @@ public class LoginSteps {
 	private String url = "https://www.saucedemo.com/";
 	
 	//Initialise the browser before each scenario
-	
 	@Before
-	public void setUp() {
-		driver = new ChromeDriver();
+	 public void setup() {
+		driver = library.Browsers.launchBrowser("Chrome");
+		driver.manage().window().maximize();
+		driver.get(this.url);
+		driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(5));
 	}
 	
+	// Cleanup after each test
+    @After
+    public void tearDown() {
+        if (driver != null) {
+            driver.quit();
+        }
+    }
+    
 	//Step definitions for login with valid credentials
 	@Given("I am on the login page")
 	public void userOnLoginPage() {
-		if (!this.driver.getCurrentUrl().equals(this.url)) {
-            this.driver.get(this.url);
+		// Verify that the user is on the login page
+            Assert.assertEquals(this.driver.getCurrentUrl(), this.url, "Expected to be on the login page");
 		}
-	}
+	
 	
 	@When("I enter valid username and password")
 	public void userEntersValidCredentials() {
 		WebElement usernameField = driver.findElement(By.id("user-name"));
 		WebElement passwordField = driver.findElement(By.id("password"));
 		usernameField.sendKeys("standard_user");
-		passwordField.sendKeys("secret_sauce");
+		passwordField.sendKeys("secretsauce");
 	}
 	
 	@And("I click on the login button")
@@ -85,13 +99,5 @@ public class LoginSteps {
 		WebElement error = driver.findElement(By.cssSelector("[data-test='error']"));
 		Assert.assertTrue(error.isDisplayed(), "Expected an error message to be displayed when fields are empty");
 	}
-	
-	 // Cleanup after each test
-    @After
-    public void tearDown() {
-        if (driver != null) {
-            driver.quit();
-        }
-    }
 
 }
