@@ -2,12 +2,12 @@ package stepdefinitions;
 
 import java.time.Duration;
 
-import java.util.concurrent.TimeUnit;
+//import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
+//import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 
 import io.cucumber.java.After;
@@ -16,25 +16,25 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import pages.LoginPage;
 
 public class LoginSteps {
 	
-	private WebDriver driver;
-	private String url = "https://www.saucedemo.com/";
+	WebDriver driver;
+	String url = "https://www.saucedemo.com/";
+	
+	LoginPage login;
+	
 	
 	//Initialise the browser before each scenario
-	
-//	@Before
-//	public void setUp() {
-//		driver = new ChromeDriver();
-//	}
-	
 	@Before
 	 public void setup() {
 		driver = library.Browsers.launchBrowser("Chrome");
 		driver.manage().window().maximize();
 		driver.get(this.url);
 		driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(5));
+		
+		login = new LoginPage(driver);
 	}
 	
 	// Cleanup after each test
@@ -45,65 +45,48 @@ public class LoginSteps {
         }
     }
     
-	//Step definitions for login with valid credentials
+	//Steps for login with valid credentials
 	@Given("I am on the login page")
 	public void userOnLoginPage() {
-		// Verify that the user is on the login page
-            Assert.assertEquals(this.driver.getCurrentUrl(), this.url, "Expected to be on the login page");
-		}
+		login.verifyUrl("https://www.saucedemo.com/");
+	}
 	
 	
 	@When("I enter valid username and password")
 	public void userEntersValidCredentials() {
-		WebElement usernameField = driver.findElement(By.id("user-name"));
-		WebElement passwordField = driver.findElement(By.id("password"));
-		usernameField.sendKeys("standard_user");
-		passwordField.sendKeys("secretsauce");
+		login.enterCredentials("standard_user", "secret_sauce");
 	}
 	
 	@And("I click on the login button")
 	public void userClicksLoginButton() {
-		WebElement loginButton = driver.findElement(By.id("login-button"));
-		loginButton.click();
+		login.clickLoginButton();
 	}
 	
 	@Then("I should be redirected to the dashboard page")
 	public void verifyPage() {
-		String expectedUrl = "https://www.saucedemo.com/inventory.html";
-		String actualUrl = driver.getCurrentUrl();
-		Assert.assertEquals(actualUrl, expectedUrl, "Expected to be redirected to the products page after successful login");
+		login.verifyUrl("https://www.saucedemo.com/inventory.html");
 	}
 
 	// Steps for invalid credentials
 	@When("I enter invalid username and password")
 	public void userEntersInvalidCredentials() {
-		WebElement usernameField = driver.findElement(By.id("user-name"));
-		WebElement passwordField = driver.findElement(By.id("password"));
-		usernameField.clear();
-		passwordField.clear();
-		usernameField.sendKeys("invalid_user");
-		passwordField.sendKeys("wrong_password");
+		login.enterCredentials("wrong_user", "wrong_password");
 	}
 
 	@Then("I should see an error message indicating invalid credentials")
 	public void verifyInvalidCredentialsError() {
-		WebElement error = driver.findElement(By.cssSelector("[data-test='error']"));
-		Assert.assertTrue(error.isDisplayed(), "Expected an error message to be displayed for invalid credentials");
+		login.verifyErrorMessage("Epic sadface: Username and password do not match any user in this service");
 	}
 
 	// Steps for empty fields
 	@When("I leave the username and password fields empty")
 	public void userLeavesFieldsEmpty() {
-		WebElement usernameField = driver.findElement(By.id("user-name"));
-		WebElement passwordField = driver.findElement(By.id("password"));
-		usernameField.clear();
-		passwordField.clear();
+		login.enterCredentials("", "");
 	}
 
 	@Then("I should see an error message indicating that fields cannot be empty")
 	public void verifyEmptyFieldsError() {
-		WebElement error = driver.findElement(By.cssSelector("[data-test='error']"));
-		Assert.assertTrue(error.isDisplayed(), "Expected an error message to be displayed when fields are empty");
+		login.verifyErrorMessage("Epic sadface: Username is required");
 	}
 
 }
