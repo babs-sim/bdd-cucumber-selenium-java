@@ -1,5 +1,6 @@
 package stepdefinitions;
 
+import hooks.Hooks;
 import java.time.Duration;
 
 //import java.util.concurrent.TimeUnit;
@@ -20,73 +21,58 @@ import pages.LoginPage;
 
 public class LoginSteps {
 	
-	WebDriver driver;
-	String url = "https://www.saucedemo.com/";
+	private LoginPage login;
 	
-	LoginPage login;
-	
-	
-	//Initialise the browser before each scenario
-	@Before
-	 public void setup() {
-		driver = library.Browsers.launchBrowser("Chrome");
-		driver.manage().window().maximize();
-		driver.get(this.url);
-		driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(5));
+	private LoginPage loginPage() {
 		
-		login = new LoginPage(driver);
+		if (login == null) {
+			login = new LoginPage(Hooks.getDriver());
+		}
+		return login;
 	}
-	
-	// Cleanup after each test
-    @After
-    public void tearDown() {
-        if (driver != null) {
-            driver.quit();
-        }
-    }
     
 	//Steps for login with valid credentials
 	@Given("I am on the login page")
 	public void userOnLoginPage() {
-		login.verifyUrl("https://www.saucedemo.com/");
+		loginPage().verifyUrl("https://www.saucedemo.com/");
 	}
 	
 	
 	@When("I enter valid username and password")
 	public void userEntersValidCredentials() {
-		login.enterCredentials("standard_user", "secret_sauce");
+		loginPage().enterCredentials("standard_user", "secret_sauce");
 	}
 	
 	@And("I click on the login button")
 	public void userClicksLoginButton() {
-		login.clickLoginButton();
+		loginPage().clickLoginButton();
 	}
 	
 	@Then("I should be redirected to the dashboard page")
 	public void verifyPage() {
-		login.verifyUrl("https://www.saucedemo.com/inventory.html");
+		loginPage().verifyUrl("https://www.saucedemo.com/inventory.html");
 	}
 
 	// Steps for invalid credentials
 	@When("I enter invalid username and password")
 	public void userEntersInvalidCredentials() {
-		login.enterCredentials("wrong_user", "wrong_password");
+		loginPage().enterCredentials("wrong_user", "wrong_password");
 	}
 
 	@Then("I should see an error message indicating invalid credentials")
 	public void verifyInvalidCredentialsError() {
-		login.verifyErrorMessage("Epic sadface: Username and password do not match any user in this service");
+		loginPage().verifyErrorMessage("Epic sadface: Username and password do not match any user in this service");
 	}
 
 	// Steps for empty fields
 	@When("I leave the username and password fields empty")
 	public void userLeavesFieldsEmpty() {
-		login.enterCredentials("", "");
+		loginPage().enterCredentials("", "");
 	}
 
 	@Then("I should see an error message indicating that fields cannot be empty")
 	public void verifyEmptyFieldsError() {
-		login.verifyErrorMessage("Epic sadface: Username is required");
+		loginPage().verifyErrorMessage("Epic sadface: Username is required");
 	}
 
 }

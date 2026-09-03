@@ -5,7 +5,7 @@ import io.cucumber.testng.CucumberOptions;
 
 @CucumberOptions(
 	features = "src/test/resources/features", // run all .feature files under this folder
-	glue = {"stepdefinitions"}, // package(s) with step definitions
+	glue = {"stepdefinitions", "hooks"}, // package(s) with step definitions
 	plugin = {"pretty", "html:target/cucumber-reports"}, // Generate HTML report
 	monochrome = true
 )
